@@ -1,3 +1,5 @@
+load File.expand_path('../tasks/mongo-sync.cap', __FILE__)
+
 class MongoSync
   def initialize(connection)
     @connection = connection
