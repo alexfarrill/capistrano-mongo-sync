@@ -4,6 +4,10 @@
 # COLLECTION=agents ./bin/cap production mongo:pull
 # ./bin/cap production mongo:sync_prod_to_staging
 
+task :mongo_test do
+  puts 'mongo test'
+end
+
 namespace :mongo do
   set :remote_dump_base, '/mnt/tmp/dumps'
   set :local_dump_base, '/tmp/dumps'
