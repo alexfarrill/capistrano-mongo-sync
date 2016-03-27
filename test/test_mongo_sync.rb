@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'mocha/mini_test'
 
-require 'capistrano/mongo-sync'
+require 'capistrano/mongo_sync/mongo_sync'
 
 class MongoSync
   def fetch(x)
