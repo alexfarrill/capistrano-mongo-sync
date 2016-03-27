@@ -15,7 +15,6 @@ class MongoSync
     fail "Incomplete configuration: missing remote_dump_base" unless @remote_dump_base
     fail "Incomplete configuration: missing local_dump_base" unless @local_dump_base
     fail "Incomplete configuration: missing production_db" unless @production_db
-    fail "Incomplete configuration: missing staging_db" unless @staging_db
     fail "Incomplete configuration: missing development_db" unless @development_db
     fail "Incomplete configuration: missing from_db" unless @from_db
   end
