@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.summary     = "A tool for keeping local mongo in sync with remote"
   gem.description = "A tool for keeping local mongo in sync with remote"
   gem.authors     = ["Open Listings Engineering"]
-  gem.email       = 'engineering@openlistinggem.com'
+  gem.email       = 'engineering@openlistings.com'
   gem.homepage    = 'https://github.com/openlistings/capistrano-mongo-sync'
   gem.license     = 'MIT'
 
