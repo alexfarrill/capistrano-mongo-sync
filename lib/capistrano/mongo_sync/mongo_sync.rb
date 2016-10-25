@@ -9,6 +9,7 @@ class MongoSync
     @from_db = fetch(:from_db)
     @collection = fetch(:collection) || 'full'
     @hipchat_client = fetch(:hipchat_client)
+    @slack_notifier = fetch(:slack_notifier)
 
     fail "Incomplete configuration: missing remote_dump_base" unless @remote_dump_base
     fail "Incomplete configuration: missing local_dump_base" unless @local_dump_base
@@ -144,7 +145,9 @@ class MongoSync
   def local_mongorestore!(local_dump_dir)
     db_dump_path = File.join local_dump_dir, @from_db
     @connection.within( @local_dump_base ) do
-      @connection.execute :mongorestore, '--drop', '-d', @development_db, db_dump_path
+      Dir.glob("#{db_dump_path}/*.bson").each do |bson_file|
+        @connection.execute :mongorestore, '--drop', '-d', @development_db, bson_file
+      end
     end
   end
 
@@ -152,6 +155,11 @@ class MongoSync
   def hipchat_notify!( room, user, msg, opts = {} )
     return unless @hipchat_client
     @hipchat_client[room].send(user, msg, opts)
+  end
+
+  def slack_notify!( msg )
+    return unless @slack_notifier
+    @slack_notifier.ping(msg)
   end
 
   ## Utility

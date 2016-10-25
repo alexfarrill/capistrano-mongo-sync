@@ -55,6 +55,16 @@ enable hipchat notifications (requires hipchat gem):
 set :hipchat_client, HipChat::Client.new('HIPCHAT_TOKEN')
 ```
 
+enable slack-notifier notifications (requires slack-notifier gem):
+```ruby
+set :slack_notifier, Slack::Notifier.new("SLACK_WEBHOOK_URL", username: "USERNAME", channel: '#CHANNEL')
+```
+
+change database server to take dumps from (useful for syncing from secondary):
+```ruby
+set :db_role_name, :db_secondary # defaults to :db
+```
+
 change where mongodumps are kept remotely and locally:
 ```ruby
 set :remote_dump_base, '/tmp/dumps'

@@ -11,10 +11,12 @@ namespace :mongo do
 
   task :sync_prod_to_staging do
     set :from_db, fetch(:production_db)
+    db_role_name = fetch(:db_role_name) || :db
 
-    on roles(:db) do
+    on roles(db_role_name) do
       ms_remote = MongoSync.new(self)
       ms_remote.hipchat_notify! 'Engineering', 'capistrano', 'Started syncing prod to staging...', color: 'yellow'
+      ms_remote.slack_notify! 'Started syncing prod to staging...'
       ms_remote.remote_setup!
       ms_remote.remote_cleanup!
 
@@ -23,11 +25,13 @@ namespace :mongo do
 
       ms_remote.staging_mongorestore! remote_dump_dir
       ms_remote.hipchat_notify! 'Engineering', 'capistrano', 'Finished syncing prod to staging...', color: 'green'
+      ms_remote.slack_notify! 'Finished syncing prod to staging...'
     end
   end
 
   task :pull do
     set :from_db, :production == fetch(:stage) ? fetch(:production_db) : fetch(:staging_db)
+    db_role_name = fetch(:db_role_name) || :db
 
     run_locally do
       ms_local = MongoSync.new(self)
@@ -46,7 +50,7 @@ namespace :mongo do
         ms_local.local_mongorestore!(local_dump_dir)
       else
         # get dump from remote
-        on roles(:db) do
+        on roles(db_role_name) do
           ms_remote = MongoSync.new(self)
           ms_remote.remote_setup!
           ms_remote.remote_cleanup!

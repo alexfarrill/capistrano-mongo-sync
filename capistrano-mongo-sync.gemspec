@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name        = 'capistrano-mongo-sync'
-  gem.version     = '0.1.4'
+  gem.version     = '0.1.5'
   gem.date        = '2016-06-13'
   gem.summary     = "A tool for keeping local mongo in sync with remote"
   gem.description = "A tool for keeping local mongo in sync with remote"
@@ -18,5 +18,4 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'minitest', '~> 5.8'
   gem.add_development_dependency 'mocha', '~> 1.1'
-
 end

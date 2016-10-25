@@ -12,6 +12,7 @@ class MongoSync
     @staging_db = 'mydb_staging'.freeze
     @from_db = 'mydb'.freeze
     @hipchat_client = nil
+    @slack_notifier = nil
     @collection = 'full'
 
     instance_variable_get("@#{x}")
@@ -91,6 +92,15 @@ class MongoSyncTest < Minitest::Test
     @mongo_sync.hipchat_notify! 'Engineering', 'capistrano', msg, opts
   end
 
+  def test_slack_notify
+    msg = 'Finished syncing prod to staging...'
+    @slack_notifier = mock()
+    @mongo_sync.instance_variable_set("@slack_notifier", @slack_notifier)
+    @slack_notifier.expects(:ping).with(msg).once
+    @mongo_sync.slack_notify! msg
+  end
+
+
   def test_staging_mongorestore_full_path
     @connection.expects(:execute).once().with(:mongorestore, '--drop', '-d', 'mydb_staging', '/mnt/tmp/dumps/mydb-agents-2015-01-01-01-01/mydb')
     @mongo_sync.staging_mongorestore! '/mnt/tmp/dumps/mydb-agents-2015-01-01-01-01/mydb'
@@ -144,7 +154,9 @@ class MongoSyncTest < Minitest::Test
   def test_local_mongorestore
     dump_dir = 'mydb-full-2015-10-07-09-36'
     @connection.expects(:within).with('/tmp/dumps').once.yields
-    @connection.expects(:execute).with(:mongorestore, '--drop', '-d', 'mydb', 'mydb-full-2015-10-07-09-36/mydb').once
+    Dir.expects(:glob).returns(['mydb-full-2015-10-07-09-36/mydb/cat.bson', 'mydb-full-2015-10-07-09-36/mydb/dog.bson'])
+    @connection.expects(:execute).with(:mongorestore, '--drop', '-d', 'mydb', 'mydb-full-2015-10-07-09-36/mydb/cat.bson').once
+    @connection.expects(:execute).with(:mongorestore, '--drop', '-d', 'mydb', 'mydb-full-2015-10-07-09-36/mydb/dog.bson').once
     @mongo_sync.local_mongorestore! dump_dir
   end
 
