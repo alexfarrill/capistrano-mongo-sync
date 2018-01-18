@@ -58,7 +58,7 @@ class MongoSync
   end
 
   def collection_ids_arg
-    '{_id: {$in: [%s]}}' % @collection_ids.split(',').map{|id| 'ObjectId("%s")' % id}.join(',')
+    '\'{_id: {$in: [%s]}}\'' % @collection_ids.split(',').map{|id| 'ObjectId("%s")' % id}.join(',')
   end
 
   def staging_mongorestore!( remote_dump_dir )
