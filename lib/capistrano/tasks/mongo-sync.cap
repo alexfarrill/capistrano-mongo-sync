@@ -2,12 +2,14 @@
 # Usage:
 # ./bin/cap production mongo:pull
 # COLLECTION=agents ./bin/cap production mongo:pull
+# COLLECTION=agents IDS=1,2,3 ./bin/cap production mongo:pull
 # ./bin/cap production mongo:sync_prod_to_staging
 
 namespace :mongo do
   set :remote_dump_base, '/tmp/dumps'
   set :local_dump_base, '/tmp/dumps'
   set :collection, ENV['COLLECTION'] || 'full'
+  set :collection_ids, ENV['IDS']
 
   task :sync_prod_to_staging do
     set :from_db, fetch(:production_db)

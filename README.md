@@ -13,6 +13,12 @@ Or sync just one collection from the database:
 COLLECTION=users cap production mongo:pull
 ```
 
+Or sync some records (comma separated list of mongo id's) from one collection from the database:
+
+```ruby
+COLLECTION=users IDS=1,2,3,4 cap production mongo:pull
+```
+
 Or sync your staging database from your production database.
 
 ```ruby
