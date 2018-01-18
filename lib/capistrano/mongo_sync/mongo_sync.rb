@@ -10,7 +10,7 @@ class MongoSync
     @staging_db = fetch(:staging_db)
     @from_db = fetch(:from_db)
     @collection = fetch(:collection) || 'full'
-    @collection_ids = fetch(:ids)
+    @collection_ids = fetch(:collection_ids)
     @hipchat_client = fetch(:hipchat_client)
 
     fail "Incomplete configuration: missing remote_dump_base" unless @remote_dump_base

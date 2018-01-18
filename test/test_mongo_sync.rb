@@ -13,6 +13,7 @@ class MongoSync
     @from_db = 'mydb'.freeze
     @hipchat_client = nil
     @collection = 'full'
+    @collection_ids = nil
 
     instance_variable_get("@#{x}")
   end
