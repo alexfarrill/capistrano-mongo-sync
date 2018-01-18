@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name        = 'capistrano-mongo-sync'
-  gem.version     = '0.1.5'
+  gem.version     = '0.1.6'
   gem.date        = '2018-01-18'
   gem.summary     = "A tool for keeping local mongo in sync with remote"
   gem.description = "A tool for keeping local mongo in sync with remote"

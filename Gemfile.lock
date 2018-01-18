@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    capistrano-mongo-sync (0.1.5)
+    capistrano-mongo-sync (0.1.6)
       capistrano (~> 3.1)
       sshkit (~> 1.2)
 
