@@ -62,6 +62,16 @@ class MongoSyncTest < Minitest::Test
     assert_equal 'mydb-agents-2015-01-01-01-01', output_dir
   end
 
+  def test_remote_mongodump_agents_collection_with_collection_ids
+    @mongo_sync.instance_variable_set("@collection", 'agents')
+    @mongo_sync.instance_variable_set("@collection_ids", '1,2,3')
+    @connection.expects(:execute).once().with(:mongodump, '-d', 'mydb', '-o', '/mnt/tmp/dumps/mydb-agents-55b84a9d317184fe61224bfb4a060fb0-2015-01-01-01-01', '-c', 'agents', '-q', '{_id: {$in: [ObjectId("1"),ObjectId("2"),ObjectId("3")]}}')
+    output_dir = @mongo_sync.remote_mongodump!
+
+    # path includes hexdigest of IDS string
+    assert_equal 'mydb-agents-55b84a9d317184fe61224bfb4a060fb0-2015-01-01-01-01', output_dir
+  end
+
   def test_dump_prompt_message
     path_to_tgz = '/tmp/dumps/mydb-full-2015-01-01-01-00.tgz'
     expected_msg = "Use local dump from today at 01:00 AM? \"%s\"? (y/n)" % path_to_tgz
@@ -104,7 +114,7 @@ class MongoSyncTest < Minitest::Test
   def test_last_remote_dump_no_dumps
     @connection.expects(:test, 'ls -td /mnt/tmp/dumps/*/mydb').returns(false)
     lrd = @mongo_sync.last_remote_dump
-    assert_equal nil, lrd
+    assert_nil lrd
   end
 
   def test_last_remote_dump_dumps_y
@@ -126,19 +136,19 @@ class MongoSyncTest < Minitest::Test
     @mongo_sync.instance_variable_set '@use_remote_dump_dir', 'n'
 
     lrd = @mongo_sync.last_remote_dump
-    assert_equal nil, lrd
+    assert_nil lrd
   end
 
   def test_last_local_dump_no_dumps
     @connection.expects(:test, 'ls -td /mnt/tmp/dumps/mydb-full*/mydb').returns(false)
     lrd = @mongo_sync.last_remote_dump
-    assert_equal nil, lrd
+    assert_nil lrd
   end
 
   def test_last_remote_dump_tgz
     @connection.expects(:test, 'ls -td /mnt/tmp/dumps/mydb-full*/mydb').returns(false)
     lrd = @mongo_sync.last_remote_dump
-    assert_equal nil, lrd
+    assert_nil lrd
   end
 
   def test_local_mongorestore

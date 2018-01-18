@@ -1,3 +1,5 @@
+require 'digest'
+
 class MongoSync
   def initialize(connection)
     @connection = connection
@@ -8,6 +10,7 @@ class MongoSync
     @staging_db = fetch(:staging_db)
     @from_db = fetch(:from_db)
     @collection = fetch(:collection) || 'full'
+    @collection_ids = fetch(:ids)
     @hipchat_client = fetch(:hipchat_client)
 
     fail "Incomplete configuration: missing remote_dump_base" unless @remote_dump_base
@@ -15,11 +18,18 @@ class MongoSync
     fail "Incomplete configuration: missing production_db" unless @production_db
     fail "Incomplete configuration: missing development_db" unless @development_db
     fail "Incomplete configuration: missing from_db" unless @from_db
+    fail "Incomplete configuration: missing collection" if @collection_ids && @collection.nil?
   end
 
   # the first part of the dump dir, without the timestamp... for example "mydatabase-full"
   def dump_dir_part
-    [@from_db, @collection].join('-')
+    str = [@from_db, @collection].join('-')
+
+    if @collection_ids
+      str = [str, Digest::MD5.hexdigest(@collection_ids)].join('-')
+    end
+
+    str
   end
 
   ## Remote
@@ -40,10 +50,15 @@ class MongoSync
 
     args = ['-d', @from_db, '-o', File.join(@remote_dump_base, dump_dir)]
     args += ['-c', @collection] unless 'full' == @collection
+    args += ['-q', collection_ids_arg] if @collection_ids
 
     @connection.execute :mongodump, *args
 
     dump_dir
+  end
+
+  def collection_ids_arg
+    '{_id: {$in: [%s]}}' % @collection_ids.split(',').map{|id| 'ObjectId("%s")' % id}.join(',')
   end
 
   def staging_mongorestore!( remote_dump_dir )
@@ -53,7 +68,10 @@ class MongoSync
       remote_dump_dir
     end
 
-    @connection.execute :mongorestore, '--drop', '-d', @staging_db, full_path_to_remote_dump_dir
+    args = []
+    args << '--drop' if drop_collection?
+    args += ['-d', @staging_db, full_path_to_remote_dump_dir]
+    @connection.execute :mongorestore, *args
   end
 
   def last_remote_dump
@@ -144,8 +162,16 @@ class MongoSync
   def local_mongorestore!(local_dump_dir)
     db_dump_path = File.join local_dump_dir, @from_db
     @connection.within( @local_dump_base ) do
-      @connection.execute :mongorestore, '--drop', '-d', @development_db, db_dump_path
+      args = []
+      args << '--drop' if drop_collection?
+      args += ['-d', @development_db, db_dump_path]
+      @connection.execute :mongorestore, *args
     end
+  end
+
+  # don't drop the collection if it's importing partially
+  def drop_collection?
+    @collection_ids.nil?
   end
 
   ## Hipchat
